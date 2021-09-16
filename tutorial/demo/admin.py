@@ -1,6 +1,6 @@
 
 from django.contrib import admin
-from .models import Book,ISBN,Character
+from .models import Book,ISBN,Character,Author
 
 
 """ we can edit the administration menu of django , some examples:
@@ -19,3 +19,5 @@ class BookAdmin(admin.ModelAdmin):
 admin.site.register(ISBN)
 
 admin.site.register(Character)
+
+admin.site.register(Author)
