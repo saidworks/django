@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.shortcuts import render
 from rest_framework import viewsets,status
 from rest_framework.decorators import action
@@ -17,12 +18,28 @@ class MovieViewSet(viewsets.ModelViewSet):
     @action(detail = True,methods = ['POST','GET'])
     def rate_movie(self,request,pk=None):
         if 'stars' in request.data:
-            print(pk)
-            response = {'message':'it is working'}
-            return Response(response,status=status.HTTP_200_OK)
-        else:
-            response = {'message': 'You need to provide stars'}
-            return Response(response, status=status.HTTP_400_BAD_REQUEST)
+            movie = Movie.objects.get(id=pk)
+            stars = request.data['stars']
+            #user = request.user
+            user = User.objects.get(id=1)
+            print('user',user.username)
+
+            try:
+                rating = Rating.objects.get(user=user.id,movie=movie.id)
+                rating.stars = stars
+                rating.save()
+                serializer = RatingSerializer(rating,many=False)
+                response = {'message': 'Rating updated', 'result ': serializer.data}
+                return Response(response, status=status.HTTP_200_OK)
+            except:
+                rating = Rating.objects.create(user=user.id, movie=movie.id,stars=stars)
+                serializer = RatingSerializer(rating,many=False)
+                response = {'message': 'Rating created', 'result ': serializer.data}
+                return Response(response, status=status.HTTP_200_OK)
+
+
+
+
 
 class RatingViewSet(viewsets.ModelViewSet):
     queryset = Rating.objects.all()
